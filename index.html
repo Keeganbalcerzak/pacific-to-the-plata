@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pacific to the Plata | A South America Overland Route</title>
+  <style>
+    :root {
+      --paper: #f4eadb;
+      --paper-deep: #e3cfb4;
+      --ink: #1c2422;
+      --muted: #65706c;
+      --coast: #86b8b3;
+      --coast-deep: #4d8f94;
+      --land: #f8f0e3;
+      --ridge: #9a8771;
+      --route: #a33b33;
+      --route-deep: #6f2925;
+      --gold: #c6903d;
+      --sage: #607b64;
+      --line: rgba(28, 36, 34, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(198, 144, 61, 0.17), transparent 28%),
+        radial-gradient(circle at 84% 78%, rgba(77, 143, 148, 0.16), transparent 31%),
+        linear-gradient(135deg, var(--paper), #ecdec8);
+    }
+
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(198, 144, 61, 0.17), transparent 28%),
+        radial-gradient(circle at 84% 78%, rgba(77, 143, 148, 0.16), transparent 31%),
+        linear-gradient(135deg, var(--paper), #ecdec8);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(198, 144, 61, 0.17), transparent 28%),
+        radial-gradient(circle at 84% 78%, rgba(77, 143, 148, 0.16), transparent 31%),
+        linear-gradient(135deg, var(--paper), #ecdec8);
+    }
+
+    .poster {
+      position: relative;
+      width: min(1440px, calc(100vw - 24px));
+      min-height: 876px;
+      margin: 12px auto;
+      padding: clamp(18px, 2.1vw, 30px);
+      overflow: hidden;
+      border: 1px solid rgba(28, 36, 34, 0.18);
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0)),
+        var(--paper);
+      box-shadow: 0 28px 90px rgba(82, 57, 31, 0.18);
+    }
+
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(28, 36, 34, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28, 36, 34, 0.025) 1px, transparent 1px);
+      background-size: 32px 32px, 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.05));
+    }
+
+    .poster-header,
+    .journey-layout {
+      position: relative;
+      z-index: 1;
+    }
+
+    .poster-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: clamp(20px, 4vw, 58px);
+      align-items: end;
+      margin-bottom: clamp(16px, 2vw, 22px);
+    }
+
+    .overline {
+      margin: 0 0 10px;
+      color: var(--sage);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: none;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(44px, 5vw, 70px);
+      line-height: 0.9;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(13px, 1.22vw, 16px);
+      line-height: 1.45;
+    }
+
+    .journey-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(270px, 320px);
+      gap: clamp(18px, 2.6vw, 32px);
+      align-items: stretch;
+    }
+
+    .map-card,
+    .itinerary {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.36);
+    }
+
+    .map-card {
+      position: relative;
+      height: clamp(520px, 46vw, 645px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .map-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42), inset 0 -80px 90px rgba(244, 234, 219, 0.62);
+    }
+
+    .itinerary {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px 20px;
+    }
+
+    .itinerary h2 {
+      margin: 0 0 11px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .itinerary ol {
+      display: grid;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .itinerary li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 8px;
+      padding: 7px 0;
+      border-top: 1px solid var(--line);
+      outline-offset: 4px;
+    }
+
+    .itinerary span {
+      color: var(--route);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .itinerary strong,
+    .itinerary em {
+      grid-column: 2;
+    }
+
+    .itinerary strong {
+      font-size: 13px;
+      line-height: 1.1;
+    }
+
+    .itinerary em {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-style: normal;
+      line-height: 1.25;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 11px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .stats b,
+    .stats small {
+      display: block;
+    }
+
+    .stats b {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .stats small {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .journey-map {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .ocean {
+      fill: rgba(134, 184, 179, 0.52);
+    }
+
+    .landwash {
+      fill: rgba(248, 240, 227, 0.76);
+    }
+
+    .plata {
+      fill: rgba(134, 184, 179, 0.38);
+    }
+
+    .province-line {
+      fill: none;
+      stroke: rgba(28, 36, 34, 0.08);
+      stroke-width: 1.5;
+    }
+
+    .coastline {
+      fill: none;
+      stroke: var(--coast-deep);
+      stroke-width: 5;
+      stroke-linecap: round;
+      opacity: 0.78;
+    }
+
+    .andes-band {
+      fill: none;
+      stroke: rgba(154, 135, 113, 0.28);
+      stroke-width: 58;
+      stroke-linecap: round;
+    }
+
+    .ridges path {
+      fill: none;
+      stroke: rgba(154, 135, 113, 0.55);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .altitude-profile {
+      fill: rgba(96, 123, 100, 0.14);
+      stroke: rgba(96, 123, 100, 0.34);
+      stroke-width: 2;
+    }
+
+    .route-soft {
+      fill: none;
+      stroke: rgba(111, 41, 37, 0.16);
+      stroke-width: 17;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .route {
+      fill: none;
+      stroke: var(--route);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: url(#softShadow);
+    }
+
+    .crossing-callout path {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 3;
+      stroke-dasharray: 7 8;
+      stroke-linecap: round;
+    }
+
+    .crossing-callout text,
+    .labels text {
+      fill: var(--ink);
+      font-size: 16px;
+      font-weight: 800;
+      paint-order: stroke;
+      stroke: rgba(248, 240, 227, 0.9);
+      stroke-width: 5;
+      stroke-linejoin: round;
+    }
+
+    .crossing-callout text {
+      fill: var(--gold);
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .stop {
+      cursor: default;
+      outline: none;
+    }
+
+    .stop circle {
+      fill: var(--land);
+      stroke: var(--route);
+      stroke-width: 4;
+    }
+
+    .stop text {
+      fill: var(--route-deep);
+      font-size: 11px;
+      font-weight: 900;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+
+    .map-legend {
+      position: absolute;
+      right: 22px;
+      bottom: 20px;
+      left: 22px;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .map-legend b {
+      display: inline-block;
+      width: 28px;
+      height: 4px;
+      margin-right: 8px;
+      border-radius: 999px;
+      background: var(--route);
+      vertical-align: middle;
+    }
+
+    .itinerary li:focus-visible,
+    .stop:focus-visible circle {
+      outline: none;
+      stroke: var(--gold);
+    }
+
+    @media (max-width: 980px) {
+      .poster {
+        width: min(760px, calc(100vw - 20px));
+        min-height: auto;
+        margin: 10px auto;
+        padding: 18px;
+      }
+
+      .poster-header,
+      .journey-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .map-card {
+        height: 560px;
+      }
+
+      .journey-map {
+        height: 100%;
+        min-height: 0;
+      }
+
+      .itinerary {
+        display: block;
+      }
+    }
+
+    @media (max-width: 620px) {
+      h1 {
+        font-size: clamp(46px, 17vw, 78px);
+      }
+
+      .map-card {
+        height: 480px;
+      }
+
+      .journey-map {
+        height: 100%;
+      }
+
+      .labels text,
+      .crossing-callout text {
+        font-size: 18px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: var(--paper);
+      }
+
+      .poster {
+        width: 100%;
+        min-height: auto;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <header class="poster-header">
+      <div>
+        <p class="overline">Chile -> Argentina -> Uruguay</p>
+        <h1>Pacific to the Plata</h1>
+      </div>
+      <p class="summary">This South America overland route runs from Valparaiso and Santiago across the Andes by bus, then north through wine country and desert valleys before turning south-east to Buenos Aires and Montevideo on the Rio de la Plata.</p>
+    </header>
+
+    <section class="journey-layout" aria-label="South America overland route map">
+      <div class="map-card">
+        <svg class="journey-map" viewBox="0 0 820 650" preserveAspectRatio="xMinYMid meet" role="img" aria-labelledby="map-title map-desc">
+          <title id="map-title">Overland route from Valparaiso to Montevideo</title>
+          <desc id="map-desc">A stylized route map through Chile, Argentina, and Uruguay with numbered stops and an Andes bus crossing callout.</desc>
+          <defs>
+            <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#54391f" flood-opacity="0.14"/>
+            </filter>
+          </defs>
+
+          <rect class="ocean" x="0" y="0" width="188" height="650"/>
+          <path class="landwash" d="M162 0 L820 0 L820 650 L80 650 C99 598 119 540 111 492 C93 391 116 314 130 232 C143 154 151 80 162 0 Z"/>
+          <path class="plata" d="M628 548 C689 534 748 539 806 568 L820 650 L642 650 C619 618 611 582 628 548 Z"/>
+          <path class="province-line" d="M344 74 C386 124 392 202 366 270 C332 358 382 439 344 514"/>
+          <path class="province-line" d="M470 92 C524 188 510 286 544 368 C572 434 548 504 586 576"/>
+          <path class="province-line" d="M595 140 C646 218 634 292 668 366 C696 428 674 510 720 590"/>
+          <path class="coastline" d="M165 28 C140 88 126 147 116 210 C101 302 82 372 96 459 C105 514 82 586 63 626"/>
+          <path class="andes-band" d="M226 12 C246 92 235 161 255 236 C280 328 246 423 268 505 C284 566 263 608 276 650"/>
+
+          <g class="ridges">
+            <path d="M232 42 l34 15 l-38 18"/>
+            <path d="M226 88 l44 19 l-48 24"/>
+            <path d="M240 150 l34 15 l-42 21"/>
+            <path d="M235 205 l48 20 l-53 27"/>
+            <path d="M252 276 l36 16 l-43 22"/>
+            <path d="M246 342 l48 22 l-52 26"/>
+            <path d="M260 422 l35 16 l-42 23"/>
+            <path d="M258 494 l48 21 l-52 27"/>
+            <path d="M270 572 l36 16 l-42 25"/>
+          </g>
+
+          <path class="altitude-profile" d="M46 602 L112 568 L164 590 L238 478 L310 572 L378 538 L460 560 L532 510 L602 580 L700 546 L774 588 L774 616 L46 616 Z"/>
+
+          <path class="route route-soft" d="M112 532 C142 514 150 491 174 488 C220 483 244 451 272 430 C318 394 350 328 398 272 C438 224 448 164 476 102 C498 54 526 32 552 26 C585 18 603 42 586 76 C568 112 546 154 544 204 C540 292 498 396 486 470 C478 524 562 536 630 548 C690 560 726 572 760 582"/>
+          <path class="route" d="M112 532 C142 514 150 491 174 488 C220 483 244 451 272 430 C318 394 350 328 398 272 C438 224 448 164 476 102 C498 54 526 32 552 26 C585 18 603 42 586 76 C568 112 546 154 544 204 C540 292 498 396 486 470 C478 524 562 536 630 548 C690 560 726 572 760 582"/>
+
+          <g class="crossing-callout">
+            <path d="M174 488 C210 481 236 458 272 430"/>
+            <text x="204" y="413">Andes bus crossing</text>
+          </g>
+
+          <g class="stops">
+            <g class="stop" data-stop="valparaiso" tabindex="0" aria-label="Stop 1, Valparaiso" transform="translate(112 532)"><circle r="10"/><text>1</text></g>
+            <g class="stop" data-stop="santiago" tabindex="0" aria-label="Stop 2, Santiago" transform="translate(174 488)"><circle r="10"/><text>2</text></g>
+            <g class="stop" data-stop="mendoza" tabindex="0" aria-label="Stop 3, Mendoza" transform="translate(272 430)"><circle r="10"/><text>3</text></g>
+            <g class="stop" data-stop="cafayate" tabindex="0" aria-label="Stop 4, Cafayate" transform="translate(398 272)"><circle r="10"/><text>4</text></g>
+            <g class="stop" data-stop="salta" tabindex="0" aria-label="Stop 5, Salta" transform="translate(476 102)"><circle r="10"/><text>5</text></g>
+            <g class="stop" data-stop="humahuaca" tabindex="0" aria-label="Stop 6, Quebrada de Humahuaca" transform="translate(552 26)"><circle r="10"/><text>6</text></g>
+            <g class="stop" data-stop="cordoba" tabindex="0" aria-label="Stop 7, Cordoba" transform="translate(486 470)"><circle r="10"/><text>7</text></g>
+            <g class="stop" data-stop="buenos-aires" tabindex="0" aria-label="Stop 8, Buenos Aires" transform="translate(630 548)"><circle r="10"/><text>8</text></g>
+            <g class="stop" data-stop="montevideo" tabindex="0" aria-label="Stop 9, Montevideo" transform="translate(760 582)"><circle r="10"/><text>9</text></g>
+          </g>
+
+          <g class="labels">
+            <text x="38" y="526">Valparaiso</text>
+            <text x="129" y="474">Santiago</text>
+            <text x="287" y="438">Mendoza</text>
+            <text x="320" y="263">Cafayate</text>
+            <text x="491" y="106">Salta</text>
+            <text x="548" y="58">Quebrada de Humahuaca</text>
+            <text x="500" y="480">Cordoba</text>
+            <text x="566" y="530">Buenos Aires</text>
+            <text x="668" y="614">Montevideo</text>
+          </g>
+        </svg>
+
+        <div class="map-legend">
+          <span><b></b> Route by bus and road</span>
+          <span>9 stops</span>
+          <span>3 countries</span>
+        </div>
+      </div>
+
+      <aside class="itinerary" aria-label="Route itinerary">
+        <div>
+          <h2>Journey Stops</h2>
+          <ol>
+            <li data-stop="valparaiso" tabindex="0"><span>01</span><strong>Valparaiso</strong><em>Pacific port city</em></li>
+            <li data-stop="santiago" tabindex="0"><span>02</span><strong>Santiago</strong><em>Capital departure</em></li>
+            <li data-stop="mendoza" tabindex="0"><span>03</span><strong>Mendoza</strong><em>Andes arrival</em></li>
+            <li data-stop="cafayate" tabindex="0"><span>04</span><strong>Cafayate</strong><em>Calchaqui valleys</em></li>
+            <li data-stop="salta" tabindex="0"><span>05</span><strong>Salta</strong><em>Northwest base</em></li>
+            <li data-stop="humahuaca" tabindex="0"><span>06</span><strong>Quebrada de Humahuaca</strong><em>High desert gorge</em></li>
+            <li data-stop="cordoba" tabindex="0"><span>07</span><strong>Cordoba</strong><em>Central Argentina</em></li>
+            <li data-stop="buenos-aires" tabindex="0"><span>08</span><strong>Buenos Aires</strong><em>Rio de la Plata</em></li>
+            <li data-stop="montevideo" tabindex="0"><span>09</span><strong>Montevideo</strong><em>Final crossing</em></li>
+          </ol>
+        </div>
+
+        <div class="stats" aria-label="Route statistics">
+          <div><b>3</b><small>Countries</small></div>
+          <div><b>9</b><small>Stops</small></div>
+          <div><b>1</b><small>Andes pass</small></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
